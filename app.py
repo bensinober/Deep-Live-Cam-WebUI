@@ -6,51 +6,52 @@ from modules.processors.frame.face_swapper import process_frame
 from modules.face_analyser import get_one_face
 
 app = Flask(__name__)
-app.config['UPLOAD_FOLDER'] = 'uploads'
-if not os.path.exists(app.config['UPLOAD_FOLDER']):
-    os.makedirs(app.config['UPLOAD_FOLDER'])
+app = Flask(__name__, static_url_path="")
+app.config["UPLOAD_FOLDER"] = "uploads"
+if not os.path.exists(app.config["UPLOAD_FOLDER"]):
+    os.makedirs(app.config["UPLOAD_FOLDER"])
 
 # Global variables
 uploaded_face_path = None
 recording = False
 out = None  # Video writer object
 
-@app.route('/')
+@app.route("/")
 def index():
-    return render_template('index.html')
+    return app.send_static_file("index.html")
 
-@app.route('/upload_face', methods=['POST'])
+@app.route("/uploadFace", methods=["POST"])
 def upload_face():
     global uploaded_face_path
-    if 'face' not in request.files:
+    if "face" not in request.files:
         return redirect(request.url)
-    file = request.files['face']
-    if file.filename == '':
+    file = request.files["face"]
+    if file.filename == "":
         return redirect(request.url)
     if file:
-        file_path = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
+        file_path = os.path.join(app.config["UPLOAD_FOLDER"], file.filename)
         file.save(file_path)
         uploaded_face_path = file_path
-    return redirect(url_for('index'))
+    return redirect(url_for("index"))
 
-@app.route('/live')
+@app.route("/live")
 def live():
-    return Response(generate_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
+    return Response(generate_frames(), mimetype="multipart/x-mixed-replace; boundary=frame")
 
-@app.route('/record/start', methods=['POST'])
+@app.route("/record/start", methods=["POST"])
 def start_record():
     global recording, out
     recording = True
-    out = cv2.VideoWriter('output.mp4', cv2.VideoWriter_fourcc(*'X264'), 20.0, (640, 480))
-    return '', 204  # No content response
+    out = cv2.VideoWriter("output.mp4", cv2.VideoWriter_fourcc(*"X264"), 20.0, (640, 480))
+    return "", 204  # No content response
 
-@app.route('/record/stop', methods=['POST'])
+@app.route("/record/stop", methods=["POST"])
 def stop_record():
     global recording, out
     recording = False
     if out:
         out.release()
-    return '', 204  # No content response
+    return "", 204  # No content response
 
 def generate_frames():
     global uploaded_face_path, recording, out
@@ -69,7 +70,7 @@ def generate_frames():
         return
 
     print("Starting live stream...")
-    
+
     while True:
         success, frame = cap.read()
         if not success:
@@ -82,20 +83,20 @@ def generate_frames():
         if recording and out:
             out.write(processed_frame)  # Write frame to video file
 
-        ret, buffer = cv2.imencode('.jpg', processed_frame)
+        ret, buffer = cv2.imencode(".jpg", processed_frame)
         if not ret:
             print("Failed to encode frame.")
             break
-        
+
         frame = buffer.tobytes()
 
-        yield (b'--frame\r\n'
-               b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+        yield (b"--frame\r\n"
+               b"Content-Type: image/jpeg\r\n\r\n" + frame + b"\r\n")
 
     cap.release()
     if recording and out:
         out.release()
     print("Live stream ended.")
 
-if __name__ == '__main__':
-    app.run(debug=True)
+if __name__ == "__main__":
+    app.run(debug=True, host="0.0.0.0")

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Holo-fogger Deep Live Cam</title>
+    <link href="https://fonts.cdnfonts.com/css/blade-runner-movie-font" rel="stylesheet">
+    <style>
+        *    { overflow: hidden; padding: 5px; }
+        body { background-color: black; text-align: center; color: gray; }
+        button {
+            border: 5px solid #1A1A1A;
+            border-radius: 10px;
+            font-size: 20px;
+            box-sizing: border-box;
+            transition: all 300ms cubic-bezier(.23, 1, 0.32, 1);
+        }
+        .overlay {}
+        .title { font-family: "Blade Runner Movie Font", sans-serif; text-align: center; height: 3rem; font-size: 32px; color: grey;}
+        .stream {
+            position: relative;
+            width: 500px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .stream video {
+            width: 100%;
+            display: block;
+        }
+        .stream:before {
+            content: '';
+            position: absolute;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 5px;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+        }
+
+        .stream:fullscreen img {
+            height: 100vh;
+            width: 100vw;
+        }
+
+        #progressBar {
+            display: none; /* Hide the progress bar initially */
+            width: 100%;
+            background-color: #f3f3f3;
+            padding: 10px;
+            text-align: center;
+        }
+
+        #message {
+            margin-top: 10px;
+            color: green;
+        }
+    </style>
+    <script type="module" id="main">
+        import { uploadFace, startLive, stopLive, toggleFullScreen } from "/main.js"
+        window.addEventListener("load", () => {
+            document.getElementById("fullScreenBtn").addEventListener("click", toggleFullScreen)
+        })
+        document.getElementById("face").addEventListener("change", uploadFace)
+        document.getElementById("startLiveBtn").addEventListener("click", startLive)
+        document.getElementById("stopLiveBtn").addEventListener("click", stopLive)
+    </script>
+</head>
+<body>
+    <div class="title">holo-fogger deep live cam</div>
+
+    <form id="uploadForm" enctype="multipart/form-data">
+        <input type="hidden" id="storedFilename" name="stored_filename">
+        <label for="providers">Select Execution Provider:</label>
+        <select id="providers" name="providers">
+            <option value="CPUExecutionProvider">CPU</option>
+            <option value="CUDAExecutionProvider">CUDA (Nvidia)</option>
+            <option value="OpenVINOExecutionProvider">OpenVINO (Intel)</option>
+        </select>
+        <label for="face">Select a Face Image:</label>
+        <input type="file" id="face" name="face">
+    </form>
+
+    <div class="buttons">
+        <button id="startLiveBtn">Go Live</button>
+        <button id="fullScreenBtn">Fullscreen</button>
+        <button id="stopLiveBtn">Stop Streaming</button>
+        <!--
+            <button id="recordBtn">Start Recording</button>
+            <button id="stopRecordButton">Stop Recording</button>
+        -->
+    </div>
+    <div id="progressBar">Starting...</div>
+    <div id="message"></div>
+
+    <div class="stream">
+        <img id="streamImg" alt="Live stream will appear here" hidden>
+    </div>
+</body>
+</html>
