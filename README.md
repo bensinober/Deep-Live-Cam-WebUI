@@ -10,7 +10,44 @@ Users of this software are expected to use this software responsibly while abidi
 
 ## Intro
 
-This is a web ui version of https://github.com/hacksider/Deep-Live-Cam.
+This is a MODIFIED web ui version of https://github.com/hacksider/Deep-Live-Cam prepared for Docker
+Only linux os supported.
+
+## Docker setup
+
+allow docker to access display
+
+    xhost +local:docker
+
+*nvidia (Cuda)*
+
+    docker build -t deep-live-cam-web -f Dockerfile.gpu .
+
+
+server version, mounting `Pictures` folder into container
+
+    docker run -it --rm --name deep-live-cam-web -e DISPLAY=$DISPLAY --gpus all \
+      -v ~/Pictures:/app/pics -p 5000:5000 --user 0 --privileged deep-live-cam-web
+
+*intel (xpu)*
+
+will work on any other setup but then using CPU
+
+    docker build -t deep-live-cam-web -f Dockerfile.xpu .
+
+server version, mounting `Pictures` folder into container
+
+    docker run -it --rm --name deep-live-cam-web -e DISPLAY=$DISPLAY --device=/dev/video0:/dev/video0 \
+      -v /tmp/.X11-unix:/tmp/.X11-unix  -v /dev/dri/card1:/dev/dri/card1 -v /dev/dri/renderD128:/dev/dri/renderD128 \
+      -v ~/Pictures:/app/pics -p 5000:5000 --user 0 --privileged deep-live-cam-web
+
+development version, mounting source as volume and launching shell
+
+    docker run -it --rm --name deep-live-cam-web -e DISPLAY=$DISPLAY --device=/dev/video0:/dev/video0 \
+      -v /tmp/.X11-unix:/tmp/.X11-unix  -v ./static:/app/static -v /dev/dri/card1:/dev/dri/card1 -v /dev/dri/renderD128:/dev/dri/renderD128 \
+      -v ~/Pictures:/app/pics -p 5000:5000 --user 0 --privileged deep-live-cam-web bash
+
+now accessible at localhost:5000 in browser
 
 ## Setup
 

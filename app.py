@@ -5,9 +5,8 @@ import threading
 from modules.processors.frame.face_swapper import process_frame
 from modules.face_analyser import get_one_face
 
-app = Flask(__name__)
 app = Flask(__name__, static_url_path="")
-app.config["UPLOAD_FOLDER"] = "uploads"
+app.config["UPLOAD_FOLDER"] = "static/uploads"
 if not os.path.exists(app.config["UPLOAD_FOLDER"]):
     os.makedirs(app.config["UPLOAD_FOLDER"])
 
@@ -38,6 +37,7 @@ def upload_face():
 def live():
     return Response(generate_frames(), mimetype="multipart/x-mixed-replace; boundary=frame")
 
+# Unused
 @app.route("/record/start", methods=["POST"])
 def start_record():
     global recording, out
@@ -45,6 +45,7 @@ def start_record():
     out = cv2.VideoWriter("output.mp4", cv2.VideoWriter_fourcc(*"X264"), 20.0, (640, 480))
     return "", 204  # No content response
 
+# Unused
 @app.route("/record/stop", methods=["POST"])
 def stop_record():
     global recording, out

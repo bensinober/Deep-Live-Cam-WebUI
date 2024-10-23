@@ -2,13 +2,14 @@ let isRecording = false
 const liveUrl = "live"
 const startRecordUrl = "/record/start"
 const stopRecordUrl = "/record/stop"
+let sourceImg = document.getElementById("sourceImg")
 let streamImg = document.getElementById("streamImg")
 const streamDiv = document.querySelector(".stream")
 const progressBar = document.getElementById("progressBar")
 const stopLiveBtn = document.getElementById("stopLiveBtn")
 const msgDiv = document.getElementById("message")
 
-async function uploadFace() {
+async function uploadFace(evt) {
   //const formData = new FormData()
   const formData = new FormData(document.getElementById("uploadForm"))
   try {
@@ -20,8 +21,13 @@ async function uploadFace() {
       stopLiveBtn.disabled = false
       const fileInput = document.getElementById("face")
       let storedFilename = document.getElementById("storedFilename")
-      storedFilename.value = fileInput.value.split("\\").pop()
-
+      const file = fileInput.value.split("\\").pop()
+      storedFilename.value = file
+      sourceImg.src = URL.createObjectURL(evt.target.files[0])
+      sourceImg.onload = function() {
+        sourceImg.display = "block"
+        URL.revokeObjectURL(sourceImg.src)
+      }
       msgDiv.innerText = "File uploaded successfully!"
 
       setTimeout(function() {

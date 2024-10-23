@@ -74,7 +74,7 @@ def parse_args() -> None:
         modules.globals.fp_ui['face_enhancer'] = True
     else:
         modules.globals.fp_ui['face_enhancer'] = False
-    
+
     modules.globals.nsfw = False
 
     # translate deprecated args

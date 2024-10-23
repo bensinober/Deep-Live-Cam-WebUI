@@ -15,7 +15,6 @@
             box-sizing: border-box;
             transition: all 300ms cubic-bezier(.23, 1, 0.32, 1);
         }
-        .overlay {}
         .title { font-family: "Blade Runner Movie Font", sans-serif; text-align: center; height: 3rem; font-size: 32px; color: grey;}
         .stream {
             position: relative;
@@ -42,7 +41,7 @@
             height: 100vh;
             width: 100vw;
         }
-
+        #sourceImg {  }
         #progressBar {
             display: none; /* Hide the progress bar initially */
             width: 100%;
@@ -57,9 +56,12 @@
         }
     </style>
     <script type="module" id="main">
-        import { uploadFace, startLive, stopLive, toggleFullScreen } from "/main.js"
+        import { uploadFace, startLive, stopLive, toggleFullScreen, openWebCam } from "/main.js"
+        //const cam = document.getElementById("webCamBtn")
+        const fullScreenBtn = document.getElementById("fullScreenBtn")
         window.addEventListener("load", () => {
-            document.getElementById("fullScreenBtn").addEventListener("click", toggleFullScreen)
+            fullScreenBtn.addEventListener("click", toggleFullScreen)
+            //cam.addEventListener("click", openWebCam)
         })
         document.getElementById("face").addEventListener("change", uploadFace)
         document.getElementById("startLiveBtn").addEventListener("click", startLive)
@@ -71,17 +73,20 @@
 
     <form id="uploadForm" enctype="multipart/form-data">
         <input type="hidden" id="storedFilename" name="stored_filename">
+        <!--
         <label for="providers">Select Execution Provider:</label>
         <select id="providers" name="providers">
             <option value="CPUExecutionProvider">CPU</option>
             <option value="CUDAExecutionProvider">CUDA (Nvidia)</option>
             <option value="OpenVINOExecutionProvider">OpenVINO (Intel)</option>
         </select>
+        -->
         <label for="face">Select a Face Image:</label>
         <input type="file" id="face" name="face">
     </form>
-
+    <img id="sourceImg" alt="Source image will appear here" width="140" height="200">
     <div class="buttons">
+        <!-- <button id="webCamBtn">Cam</button> -->
         <button id="startLiveBtn">Go Live</button>
         <button id="fullScreenBtn">Fullscreen</button>
         <button id="stopLiveBtn">Stop Streaming</button>
