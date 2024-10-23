@@ -21,8 +21,6 @@ RUN apt-get update && apt-get install -y \
 # Set working directory
 WORKDIR /app
 
-RUN apt remove -y python3-blink
-
 # Install Python dependencies
 COPY requirements-gpu.txt /app/
 RUN pip3 install --no-cache-dir -r requirements-gpu.txt
