@@ -54,6 +54,36 @@ def stop_record():
         out.release()
     return "", 204  # No content response
 
+@app.route("/image", methods=["POST"])
+def receive_image(image):
+    global uploaded_face_path
+    image = base64_to_image(image) # Decode the base64-encoded image data
+    source_face = get_one_face(cv2.imread(uploaded_face_path))
+    if source_face is None:
+        print("No face detected in the uploaded image.")
+        return "No source face", 500
+    processed_frame = process_frame(source_face, image)
+    ret, buffer = cv2.imencode(".jpg", processed_frame)
+    if not ret:
+        print("Failed to encode frame.")
+        return "Failed to encode frame", 500
+    frame = buffer.tobytes()
+    yield (b"--frame\r\n"
+           b"Content-Type: image/jpeg\r\n\r\n" + frame + b"\r\n")
+
+# https://plainenglish.io/blog/real-time-image-processing-using-websockets-and-flask-in-python-and-javascript
+def base64_to_image(base64_string):
+    # Extract the base64 encoded binary data from the input string
+    base64_data = base64_string.split(",")[1]
+    # Decode the base64 data to bytes
+    image_bytes = base64.b64decode(base64_data)
+    # Convert the bytes to numpy array
+    image_array = np.frombuffer(image_bytes, dtype=np.uint8)
+    # Decode the numpy array as an image using OpenCV
+    image = cv2.imdecode(image_array, cv2.IMREAD_COLOR)
+    return image
+
+# generate frames from local camera
 def generate_frames():
     global uploaded_face_path, recording, out
     if uploaded_face_path is None:

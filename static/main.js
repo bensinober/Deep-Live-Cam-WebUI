@@ -68,4 +68,39 @@ function toggleFullScreen() {
   }
 }
 
-export { uploadFace, startLive, stopLive, toggleFullScreen }
+async function openWebCam() {
+  if (navigator.mediaDevices.getUserMedia) {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true })
+      //video.src = window.URL.createObjectURL(stream)
+      const [track] = stream.getVideoTracks()
+      const processor = new MediaStreamTrackProcessor(track)
+      const reader = await processor.readable.getReader()
+
+      var captureInterval
+      async function readFrame() {
+        const { value: frame, done } = await reader.read()
+        // value = frame
+        if (frame) {
+          const bitmap = await createImageBitmap(frame)
+          console.log(bitmap)
+          // upload to server and present result
+          imageCountSpan.innerText++
+        }
+        if (done) {
+          clearInterval(captureInterval)
+        }
+      }
+
+      const intervalSec = 0.5
+      const interval = (parseInt(intervalSec) >= 1 ? intervalSec * 1 : 1) * 1000
+      captureInterval = setInterval(async () => {
+        await readFrame()
+      }, interval)
+    } catch(err) {
+      console.log(err)
+    }
+  }
+}
+
+export { uploadFace, startLive, stopLive, toggleFullScreen, openWebCam }
