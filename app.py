@@ -13,6 +13,8 @@ if not os.path.exists(app.config["UPLOAD_FOLDER"]):
 # Global variables
 uploaded_face_path = None
 recording = False
+paused = False
+paused_frame = None
 out = None  # Video writer object
 
 @app.route("/")
@@ -35,7 +37,14 @@ def upload_face():
 
 @app.route("/live")
 def live():
-    return Response(generate_frames(), mimetype="multipart/x-mixed-replace; boundary=frame")
+    currentFrame = generate_frames()
+    return Response(currentFrame, mimetype="multipart/x-mixed-replace; boundary=frame")
+
+@app.route("/pause")
+def pause():
+    global paused
+    paused = not paused
+    return "", 204  # No content response
 
 # Unused
 @app.route("/record/start", methods=["POST"])
@@ -108,8 +117,11 @@ def generate_frames():
             print("Failed to capture frame from webcam.")
             break
 
-        # Process the frame with the selected face
-        processed_frame = process_frame(source_face, frame)
+        if paused == True:
+            processed_frame = paused_frame  # return last processed frame
+        else:
+            processed_frame = process_frame(source_face, frame) # Process the frame with the selected face
+            paused_frame = processed_frame
 
         if recording and out:
             out.write(processed_frame)  # Write frame to video file

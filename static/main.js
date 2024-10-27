@@ -1,4 +1,5 @@
 let isRecording = false
+let isPaused = false
 const liveUrl = "live"
 const startRecordUrl = "/record/start"
 const stopRecordUrl = "/record/stop"
@@ -7,6 +8,7 @@ let streamImg = document.getElementById("streamImg")
 const streamDiv = document.querySelector(".stream")
 const progressBar = document.getElementById("progressBar")
 const stopLiveBtn = document.getElementById("stopLiveBtn")
+const pauseLiveBtn = document.getElementById("pauseLiveBtn")
 const msgDiv = document.getElementById("message")
 
 async function uploadFace(evt) {
@@ -44,6 +46,7 @@ function startLive() {
     progressBar.style.display = "block"
     streamImg.style.display = "none"
     stopLiveBtn.disabled = false
+    pauseLiveBtn.disabled = false
 
     streamImg.onload = function() {
         progressBar.style.display = "none"
@@ -51,6 +54,16 @@ function startLive() {
     }
 
     streamImg.src = liveUrl
+}
+
+function pauseLive() {
+    isPaused = !isPaused
+    fetch("/pause")
+    if (isPaused === true) {
+      pauseLiveBtn.innerHTML = "Resume"
+    } else {
+      pauseLiveBtn.innerHTML = "Pause"
+    }
 }
 
 function stopLive() {
@@ -68,6 +81,7 @@ function toggleFullScreen() {
   }
 }
 
+// TODO: ALLOW webcam over https for remote use
 async function openWebCam() {
   if (navigator.mediaDevices.getUserMedia) {
     try {
@@ -103,4 +117,4 @@ async function openWebCam() {
   }
 }
 
-export { uploadFace, startLive, stopLive, toggleFullScreen, openWebCam }
+export { uploadFace, startLive, pauseLive, stopLive, toggleFullScreen, openWebCam }

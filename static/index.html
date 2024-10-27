@@ -56,7 +56,7 @@
         }
     </style>
     <script type="module" id="main">
-        import { uploadFace, startLive, stopLive, toggleFullScreen, openWebCam } from "/main.js"
+        import { uploadFace, startLive, pauseLive, stopLive, toggleFullScreen, openWebCam } from "/main.js"
         //const cam = document.getElementById("webCamBtn")
         const fullScreenBtn = document.getElementById("fullScreenBtn")
         window.addEventListener("load", () => {
@@ -64,6 +64,7 @@
             //cam.addEventListener("click", openWebCam)
         })
         document.getElementById("face").addEventListener("change", uploadFace)
+        document.getElementById("pauseLiveBtn").addEventListener("click", pauseLive)
         document.getElementById("startLiveBtn").addEventListener("click", startLive)
         document.getElementById("stopLiveBtn").addEventListener("click", stopLive)
     </script>
@@ -88,6 +89,7 @@
     <div class="buttons">
         <!-- <button id="webCamBtn">Cam</button> -->
         <button id="startLiveBtn">Go Live</button>
+        <button id="pauseLiveBtn">Pause</button>
         <button id="fullScreenBtn">Fullscreen</button>
         <button id="stopLiveBtn">Stop Streaming</button>
         <!--
